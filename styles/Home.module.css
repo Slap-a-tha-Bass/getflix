@@ -13,23 +13,47 @@
   position: relative;
   overflow: hidden;
   margin-bottom: 4rem;
-  width: 65%;
+  width: 50%;
+  left: 25%;
 }
-.logoDiv {
+.logoDivLeft {
   position: absolute;
+  display:flex;
+  justify-content: space-around;
   top: 0;
-  left:65%;
+  left:0;
   z-index: 1;
-  font-size: clamp(2rem, 4vw, 4rem);
   background-color: #002a36;
-  width:35%;
+  width:25%;
   height:30vh;
-  text-align: center;
-  text-decoration: overline #008fc7;
+}
+.logoDivRight {
+  position: absolute;
+  display:flex;
+  justify-content: space-around;
+  top: 0;
+  left:75%;
+  z-index: 1;
+  background-color: #002a36;
+  width:25%;
+  height:30vh;
 }
 .logoTitle {
   text-shadow: 2px 2px 4px #008fc7;
-  color:#002a36;
+  color:#001318;
+  text-decoration: overline#001318;
+  font-size: clamp(2.5rem, 4vw, 5rem);
+  margin-left: 2rem;
+}
+.menuText {
+  color: #008fc7;
+}
+.videoPageLayout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 .footer {
   display: flex;

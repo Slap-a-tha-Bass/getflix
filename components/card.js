@@ -1,8 +1,8 @@
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-export default function Card({ thumbnail, title }) {
+export default function Card({ thumbnail, title, slug }) {
   return (
-    <div className={styles.card}>
+    <a href={`/video/${slug}`} className={styles.card}>
       <Image
         src={thumbnail}
         width={300}
@@ -11,6 +11,6 @@ export default function Card({ thumbnail, title }) {
         style={{ borderRadius: "10px" }}
       />
       <h2>{title}</h2>
-    </div>
+    </a>
   );
 }

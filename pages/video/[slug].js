@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "../../styles/Home.module.css";
 
 export async function getStaticProps({ params }) {
@@ -82,11 +83,20 @@ export async function getStaticPaths() {
 }
 export default function Video({ video }) {
   return (
-    <div className={styles.main}>
+    <div className={styles.videoPageLayout}>
       <div>
         <h1>{video.title}</h1>
         <p>{video.description}</p>
-        <Image src={video.thumbnail.url} height={300} width={400} alt={video.title} />
+        <Image
+          src={video.thumbnail.url}
+          height={300}
+          width={400}
+          alt={video.title}
+        />
+      </div>
+      <div>
+        <Link href="/">&larr;</Link>
+        <button>Play</button>
       </div>
     </div>
   );
