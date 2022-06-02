@@ -86,7 +86,7 @@ export default function Video({ video }) {
       <div>
         <h1>{video.title}</h1>
         <p>{video.description}</p>
-        <Image src={video.thumbnail.url} height={300} width={400}/>
+        <Image src={video.thumbnail.url} height={300} width={400} alt={video.title} />
       </div>
     </div>
   );

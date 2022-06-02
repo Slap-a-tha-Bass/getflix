@@ -8,7 +8,7 @@ export async function getStaticProps() {
     uri: process.env.NEXT_PRIVATE_API_ENDPOINT,
     cache: new InMemoryCache(),
     headers: {
-      "authorization": process.env.NEXT_PRIVATE_GRAPH_CMS_TOKEN,
+      authorization: process.env.NEXT_PRIVATE_GRAPH_CMS_TOKEN,
     },
   });
   const data = await client.query({
@@ -41,7 +41,8 @@ export async function getStaticProps() {
   };
 }
 
-export default function Home( { videos } ) {
+export default function Home({ videos }) {
+  const randomVideo = videos[Math.floor(Math.random() * videos.length)];
   return (
     <div className={styles.container}>
       <Head>
@@ -54,6 +55,14 @@ export default function Home( { videos } ) {
       </Head>
 
       <main className={styles.main}>
+        <div>
+          <Image
+            src={randomVideo.thumbnail.url}
+            width={800}
+            height={500}
+            alt=""
+          />
+        </div>
         <div className={styles.grid}>
           {videos.map((video) => {
             return (
