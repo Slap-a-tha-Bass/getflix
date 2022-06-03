@@ -32,6 +32,22 @@ export async function getStaticProps() {
       }
     `,
   });
+  const accountData = await client.query({
+    query: gql`
+      query MyQuery($id: ID) {
+        account(where: { id: $id }) {
+          username
+          avatar {
+            url
+          }
+        }
+      }
+    `,
+    variables: {
+      id: "cl3w2vl8tpoaa0bkb5u8l52av",
+    },
+  });
+  const account = accountData.data.account;
 
   const videos = data.data.videos;
   const randomVideo = videos[Math.floor(Math.random() * videos.length)];
@@ -39,16 +55,19 @@ export async function getStaticProps() {
     props: {
       videos,
       randomVideo,
+      account,
     },
   };
 }
 
-export default function Home({ videos, randomVideo }) {
+export default function Home({ videos, randomVideo, account }) {
   const filteredVideos = (videos, genre) =>
     videos.filter((video) => video.tags.includes(genre));
   const recommendedVideos = (videos) => {
-    return videos.filter(video => video.seen === false || video.seen === null);
-  }
+    return videos.filter(
+      (video) => video.seen === false || video.seen === null
+    );
+  };
   return (
     <div className={styles.container}>
       <Head>
@@ -66,7 +85,14 @@ export default function Home({ videos, randomVideo }) {
         </div>
         <div className={styles.logoDivRight}>
           <div style={{ marginTop: "1rem" }}>
-            <p className={styles.menuText}>Account</p>
+            <p className={styles.menuText}>{account?.username}</p>
+            <Image
+              src={account?.avatar.url}
+              height={50}
+              width={50}
+              alt={account?.username}
+              style={{ borderRadius: "50%" }}
+            />
             <p className={styles.menuText}>Log Out</p>
             <p className={styles.menuText}>Contact</p>
           </div>

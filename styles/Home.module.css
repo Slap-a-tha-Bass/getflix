@@ -55,6 +55,19 @@
   align-items: center;
   height: 100vh;
 }
+.playButton {
+  padding: 1rem;
+  border-radius: 50%;
+  background: linear-gradient(to right,#002a36, #007595);
+  color: #fff;
+  border: none;
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  cursor: pointer;
+  margin: clamp(1rem, 4vw, 3rem);
+}
+.playButton:hover, .playButton:active, .playButton:focus {
+  background: linear-gradient(to right,#007595, #002a36);
+}
 .footer {
   display: flex;
   flex: 1;
