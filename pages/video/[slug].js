@@ -3,15 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "../../styles/Home.module.css";
 import { useState } from "react";
+import { client } from "../../lib/apollo-client";
 
 export async function getStaticProps({ params }) {
-  const client = new ApolloClient({
-    uri: `${process.env.NEXT_PRIVATE_API_ENDPOINT}`,
-    cache: new InMemoryCache(),
-    headers: {
-      authorization: `Bearer ${process.env.NEXT_PRIVATE_GRAPH_CMS_TOKEN}`,
-    },
-  });
   const data = await client.query({
     query: gql`
       query OneVideo($slug: String) {

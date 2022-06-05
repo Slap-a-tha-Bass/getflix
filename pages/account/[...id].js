@@ -1,13 +1,7 @@
-import { gql, ApolloClient, InMemoryCache } from "@apollo/client";
+import { gql } from "@apollo/client";
 import Image from "next/image";
+import { client } from "../../lib/apollo-client";
 
-const client = new ApolloClient({
-  uri: `${process.env.NEXT_PRIVATE_API_ENDPOINT}`,
-  cache: new InMemoryCache(),
-  headers: {
-    authorization: `Bearer ${process.env.NEXT_PRIVATE_GRAPH_CMS_TOKEN}`,
-  },
-});
 export async function getStaticPaths() {
   const { data } = await client.query({
     query: gql`
