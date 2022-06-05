@@ -4,9 +4,9 @@ import Card from "./card";
 
 export default function Videos({ videos, randomVideo }) {
   const filteredVideos = (videos, genre) =>
-    videos?.filter((video) => video.tags.includes(genre));
+    videos.filter((video) => video.tags.includes(genre));
   const recommendedVideos = (videos) => {
-    return videos?.filter(
+    return videos.filter(
       (video) => video.seen === false || video.seen === null
     );
   };
@@ -42,17 +42,19 @@ export default function Videos({ videos, randomVideo }) {
           <div style={{ width: "10%" }}>
             <h2 className={styles.genreTitle}>Family</h2>
           </div>
-          {filteredVideos(videos, "family")?.map((video) => {
-            return (
-              <Card
-                title={video.title}
-                description={video.description}
-                thumbnail={video.thumbnail.url}
-                slug={video.slug}
-                key={video.id}
-              />
-            );
-          })}
+          {videos
+            .filter((video) => video.tags?.includes("family"))
+            .map((video) => {
+              return (
+                <Card
+                  title={video.title}
+                  description={video.description}
+                  thumbnail={video.thumbnail.url}
+                  slug={video.slug}
+                  key={video.id}
+                />
+              );
+            })}
         </div>
         <div className={styles.grid}>
           <div style={{ width: "10%" }}>

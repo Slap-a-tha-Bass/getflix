@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { ApolloClient, InMemoryCache, gql, useMutation } from "@apollo/client";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "../../styles/Home.module.css";
@@ -43,6 +43,15 @@ export async function getStaticProps({ params }) {
     },
   };
 }
+const CHANGE_SEEN = gql`
+  mutation MyMutation($slug: String, $seen: Boolean) {
+    updateVideo(data: { seen: $seen }, where: { slug: $slug }) {
+      id
+      seen
+      title
+    }
+  }
+`;
 export async function getStaticPaths() {
   const client = new ApolloClient({
     uri: `${process.env.NEXT_PRIVATE_API_ENDPOINT}`,
@@ -84,15 +93,20 @@ export async function getStaticPaths() {
 }
 export default function Video({ video }) {
   const [watching, setWatching] = useState(false);
+  const [changeSeen, { data, loading, error }] = useMutation(CHANGE_SEEN, {
+    variables: {
+      slug: video.slug,
+      seen: video.seen,
+    },
+  });
   return (
     <div className={styles.videoPageLayout}>
       {!watching && (
         <div className={styles.grid}>
-          <div style={{width:"80vw", height:"40vh", position: "relative"}}>
-            <div style={{zIndex:"1", position: "absolute", top:"50%"}}>
-
-            <h1>{video.title}</h1>
-            <p>{video.description}</p>
+          <div style={{ width: "80vw", height: "40vh", position: "relative" }}>
+            <div style={{ zIndex: "1", position: "absolute", top: "50%" }}>
+              <h1>{video.title}</h1>
+              <p>{video.description}</p>
             </div>
             <Image
               style={{ borderRadius: "10px" }}
@@ -106,7 +120,7 @@ export default function Video({ video }) {
       )}
       <div>
         {!watching && (
-          <div style={{fontSize:"2rem", color: "#002a36"}}>
+          <div style={{ fontSize: "2rem", color: "#002a36" }}>
             <Link href="/">&larr;</Link>
             <button
               className={styles.playButton}
@@ -125,6 +139,7 @@ export default function Video({ video }) {
           </video>
         )}
       </div>
+      <button onClick={() => console.log(data)}>Change Seen Status</button>
     </div>
   );
 }

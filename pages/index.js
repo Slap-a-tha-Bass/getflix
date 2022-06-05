@@ -1,66 +1,48 @@
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import Videos from "../components/videos";
+import Loader from "../components/loader";
 
-export async function getStaticProps() {
-  const client = new ApolloClient({
-    uri: `${process.env.NEXT_PRIVATE_API_ENDPOINT}`,
-    cache: new InMemoryCache(),
-    headers: {
-      authorization: `Bearer ${process.env.NEXT_PRIVATE_GRAPH_CMS_TOKEN}`,
-    },
-  });
-  const data = await client.query({
-    query: gql`
-      query AllVideos {
-        videos {
-          id
-          title
-          description
-          seen
-          tags
-          slug
-          thumbnail {
-            url
-          }
-          mp4 {
-            url
-          }
-        }
+const GET_VIDEOS_AND_GET_ACCOUNT = gql`
+  query getAccount($accountId: ID!) {
+    account(where: { id: $accountId }) {
+      id
+      username
+      avatar {
+        url
       }
-    `,
-  });
-  const accountData = await client.query({
-    query: gql`
-      query MyQuery($id: ID) {
-        account(where: { id: $id }) {
-          username
-          avatar {
-            url
-          }
-        }
+    }
+    videos {
+      id
+      title
+      description
+      seen
+      slug
+      tags
+      thumbnail {
+        url
       }
-    `,
-    variables: {
-      id: "cl3w2vl8tpoaa0bkb5u8l52av",
-    },
+      mp4 {
+        url
+      }
+    }
+  }
+`;
+export default function Home({ accountId }) {
+  const { loading, error, data } = useQuery(GET_VIDEOS_AND_GET_ACCOUNT, {
+    variables: { accountId: "cl3w2vl8tpoaa0bkb5u8l52av" },
   });
-  const account = accountData.data.account;
 
-  const videos = data.data.videos;
-  const randomVideo = videos[Math.floor(Math.random() * videos.length)];
-  return {
-    props: {
-      videos,
-      randomVideo,
-      account,
-    },
-  };
-}
-
-export default function Home({ videos, randomVideo, account }) {
+  const randomVideo =
+    data?.videos[Math.floor(Math.random() * data.videos.length)];
+  setTimeout(() => {
+    return loading;
+  }, 1000);
+  if (loading) return <Loader />;
+  if (error) return `Error, ${error.message}`;
+  console.log(data?.account);
   return (
     <div className={styles.container}>
       <Head>
@@ -78,19 +60,19 @@ export default function Home({ videos, randomVideo, account }) {
         </div>
         <div className={styles.logoDivRight}>
           <div style={{ marginTop: "1rem" }}>
-            <p className={styles.menuText}>{account?.username}</p>
+            <p className={styles.menuText}>{data?.account.username}</p>
             <Image
-              src={account?.avatar.url}
+              src={data?.account.avatar.url}
               height={50}
               width={50}
-              alt={account?.username}
+              alt={data?.account.username}
               style={{ borderRadius: "50%" }}
             />
             <p className={styles.menuText}>Log Out</p>
             <p className={styles.menuText}>Contact</p>
           </div>
         </div>
-        <Videos videos={videos} randomVideo={randomVideo} />
+        <Videos videos={data?.videos} randomVideo={randomVideo} />
       </main>
 
       <footer className={styles.footer}>
