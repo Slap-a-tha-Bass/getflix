@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, gql, useMutation } from "@apollo/client";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "../../styles/Home.module.css";
@@ -37,15 +37,15 @@ export async function getStaticProps({ params }) {
     },
   };
 }
-const CHANGE_SEEN = gql`
-  mutation MyMutation($slug: String, $seen: Boolean) {
-    updateVideo(data: { seen: $seen }, where: { slug: $slug }) {
-      id
-      seen
-      title
-    }
-  }
-`;
+// const CHANGE_SEEN = gql`
+//   mutation MyMutation($slug: String, $seen: Boolean) {
+//     updateVideo(data: { seen: $seen }, where: { slug: $slug }) {
+//       id
+//       seen
+//       title
+//     }
+//   }
+// `;
 export async function getStaticPaths() {
   const client = new ApolloClient({
     uri: `${process.env.NEXT_PRIVATE_API_ENDPOINT}`,
@@ -87,12 +87,12 @@ export async function getStaticPaths() {
 }
 export default function Video({ video }) {
   const [watching, setWatching] = useState(false);
-  const [changeSeen, { data, loading, error }] = useMutation(CHANGE_SEEN, {
-    variables: {
-      slug: video.slug,
-      seen: video.seen,
-    },
-  });
+  // const [changeSeen, { data, loading, error }] = useMutation(CHANGE_SEEN, {
+  //   variables: {
+  //     slug: video.slug,
+  //     seen: video.seen,
+  //   },
+  // });
   return (
     <div className={styles.videoPageLayout}>
       {!watching && (
@@ -133,7 +133,7 @@ export default function Video({ video }) {
           </video>
         )}
       </div>
-      <button onClick={() => console.log(data)}>Change Seen Status</button>
+      {/* <button onClick={() => console.log(data)}>Change Seen Status</button> */}
     </div>
   );
 }
