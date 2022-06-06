@@ -1,21 +1,19 @@
-import { useState, useEffect } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "../styles/Home.module.css";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import Videos from "../components/videos";
 import Loader from "../components/loader";
-import { client } from "../lib/apollo-client";
 
-
-export default function Home({ videos, randomVideo, account }) {
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    if (videos) {
-      setLoading(false);
-    }
-  }, [videos]);
+export default function Home() {
+  const { loading, error, data } = useQuery(GET_VIDEOS_AND_ACCOUNT_INFO);
+  if (error) return `Error! ${error.message}`;
   if (loading) return <Loader />;
+
+  const randomVideo =
+    data.videos[Math.floor(Math.random() * data.videos.length)];
+
   return (
     <div className={styles.container}>
       <Head>
@@ -32,20 +30,20 @@ export default function Home({ videos, randomVideo, account }) {
           <h1 className={styles.logoTitle}>Getflix</h1>
         </div>
         <div className={styles.logoDivRight}>
-          <div style={{ marginTop: "1rem" }}>
-            <p className={styles.menuText}>{account.username}</p>
+          <div style={{ marginTop: "1rem", display:"flex", alignItems:"flex-start" }}>
+            <Link href={`/account/${data.account.id}`}>
+              <p className={styles.menuText}>Welcome, {data.account.username}</p>
+            </Link>
             <Image
-              src={account.avatar.url}
+              src={data.account.avatar.url}
               height={50}
               width={50}
-              alt={account.username}
+              alt={data.account.username}
               style={{ borderRadius: "50%" }}
             />
-            <p className={styles.menuText}>Log Out</p>
-            <p className={styles.menuText}>Contact</p>
           </div>
         </div>
-        <Videos videos={videos} randomVideo={randomVideo} />
+        <Videos videos={data.videos} randomVideo={randomVideo} />
       </main>
 
       <footer className={styles.footer}>
@@ -54,45 +52,28 @@ export default function Home({ videos, randomVideo, account }) {
     </div>
   );
 }
-
-export async function getStaticProps() {
-  const data = await client.query({
-    query: gql`
-      query AllVideos {
-        videos {
-          id
-          title
-          description
-          seen
-          slug
-          tags
-          thumbnail {
-            url
-          }
-          mp4 {
-            url
-          }
-        }
-        account(where: { id: "cl3w2vl8tpoaa0bkb5u8l52av"}) {
-          id
-          username
-          avatar {
-            url
-          }
-        }
+const GET_VIDEOS_AND_ACCOUNT_INFO = gql`
+  query PageVideos {
+    videos {
+      id
+      title
+      description
+      seen
+      slug
+      tags
+      thumbnail {
+        url
       }
-    `,
-  });
-
-  const videos = data.data.videos;
-  const account = data.data.account;
-  const randomVideo = videos[Math.floor(Math.random() * videos.length)];
-
-  return {
-    props: {
-      videos,
-      randomVideo,
-      account,
-    },
-  };
-}
+      mp4 {
+        url
+      }
+    }
+    account(where: { id: "cl3w2vl8tpoaa0bkb5u8l52av" }) {
+      id
+      username
+      avatar {
+        url
+      }
+    }
+  }
+`;

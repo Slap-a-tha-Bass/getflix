@@ -1,10 +1,82 @@
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { ApolloClient, gql, useMutation } from "@apollo/client";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "../../styles/Home.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { client } from "../../lib/apollo-client";
+import Loader from "../../components/loader";
+import { BsFillPlayCircleFill } from "react-icons/bs";
 
+export default function Video({ video }) {
+  const [watching, setWatching] = useState(false);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (video) {
+      setLoading(false);
+    }
+  }, []);
+  if (loading) {
+    return <Loader />;
+  }
+  return (
+    <div className={styles.videoPageLayout}>
+      {!watching && (
+        <div
+        className={styles.playButton}
+        style={{ fontSize: "2rem" }}
+        >
+          <Link href="/">&larr;</Link>
+        </div>
+      )}
+      {!watching && (
+        <div className={styles.grid}>
+          <div style={{ width: "50vw", height: "40vh", position: "relative" }}>
+            <div style={{ zIndex: "1", position: "absolute", top: "50%" }}>
+              <h1 className={styles.videoText}>{video.title}</h1>
+              <p className={styles.videoText}>{video.description}</p>
+            </div>
+            <Image
+              style={{ borderRadius: "10px" }}
+              layout="fill"
+              src={video.thumbnail.url}
+              alt={video.title}
+              priority
+            />
+          </div>
+        </div>
+      )}
+      <div>
+        {!watching && (
+          <div style={{ fontSize: "2rem", color: "#002a36" }}>
+            <button
+              className={styles.playButton}
+              onClick={() => setWatching(!watching)}
+            >
+              <BsFillPlayCircleFill />
+            </button>
+          </div>
+        )}
+        {watching && (
+          <video width="100%" height="100%" controls>
+            <source src={video.mp4.url} type="video/mp4" />
+          </video>
+        )}
+      </div>
+      {/* <button onClick={handleWatch}>
+        Change Seen Status
+      </button> */}
+    </div>
+  );
+}
+const CHANGE_SEEN = gql`
+  mutation MyMutation($slug: String, $seen: Boolean) {
+    updateVideo(data: { seen: $seen }, where: { slug: $slug }) {
+      id
+      seen
+      title
+    }
+  }
+`;
 export async function getStaticProps({ params }) {
   const data = await client.query({
     query: gql`
@@ -28,32 +100,14 @@ export async function getStaticProps({ params }) {
       slug: params.slug,
     },
   });
-
   const video = data.data.video;
-
   return {
     props: {
       video,
     },
   };
 }
-// const CHANGE_SEEN = gql`
-//   mutation MyMutation($slug: String, $seen: Boolean) {
-//     updateVideo(data: { seen: $seen }, where: { slug: $slug }) {
-//       id
-//       seen
-//       title
-//     }
-//   }
-// `;
 export async function getStaticPaths() {
-  const client = new ApolloClient({
-    uri: `${process.env.NEXT_PRIVATE_API_ENDPOINT}`,
-    cache: new InMemoryCache(),
-    headers: {
-      authorization: `Bearer ${process.env.NEXT_PRIVATE_GRAPH_CMS_TOKEN}`,
-    },
-  });
   const data = await client.query({
     query: gql`
       query PageVideos {
@@ -84,56 +138,4 @@ export async function getStaticPaths() {
     paths,
     fallback: false,
   };
-}
-export default function Video({ video }) {
-  const [watching, setWatching] = useState(false);
-  // const [changeSeen, { data, loading, error }] = useMutation(CHANGE_SEEN, {
-  //   variables: {
-  //     slug: video.slug,
-  //     seen: video.seen,
-  //   },
-  // });
-  return (
-    <div className={styles.videoPageLayout}>
-      {!watching && (
-        <div className={styles.grid}>
-          <div style={{ width: "80vw", height: "40vh", position: "relative" }}>
-            <div style={{ zIndex: "1", position: "absolute", top: "50%" }}>
-              <h1>{video.title}</h1>
-              <p>{video.description}</p>
-            </div>
-            <Image
-              style={{ borderRadius: "10px" }}
-              layout="fill"
-              src={video.thumbnail.url}
-              alt={video.title}
-              priority
-            />
-          </div>
-        </div>
-      )}
-      <div>
-        {!watching && (
-          <div style={{ fontSize: "2rem", color: "#002a36" }}>
-            <Link href="/">&larr;</Link>
-            <button
-              className={styles.playButton}
-              onClick={() => setWatching(!watching)}
-            >
-              Play
-            </button>
-          </div>
-        )}
-        {watching && (
-          <button onClick={() => setWatching(!watching)}>&larr;</button>
-        )}
-        {watching && (
-          <video width="100%" controls>
-            <source src={video.mp4.url} type="video/mp4" />
-          </video>
-        )}
-      </div>
-      {/* <button onClick={() => console.log(data)}>Change Seen Status</button> */}
-    </div>
-  );
 }
