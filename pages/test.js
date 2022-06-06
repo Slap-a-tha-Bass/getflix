@@ -24,7 +24,7 @@ export default function Test() {
   return (
     <div>
       {data?.videos.map((video) => {
-        return <div>{video.title}</div>;
+        return <div key={video.id}>{video.title}</div>;
       })}
     </div>
   );
